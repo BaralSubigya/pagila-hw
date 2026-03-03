@@ -21,15 +21,17 @@ jobs:
         run: |
           git submodule update --init --recursive
 
-          docker-compose up -d --build
+          docker compose up -d --build
           sleep 10
 
-          # create pagila database (ignore if already exists)
-          docker-compose exec -T pg psql -U postgres -d postgres -c "CREATE DATABASE pagila;" || true
+          # create pagila database (ignore if exists)
+          docker compose exec -T pg psql -U postgres -d postgres -c "CREATE DATABASE pagila;" || true
 
-          # load schema + data
-          docker-compose exec -T pg psql -U postgres -d pagila -v ON_ERROR_STOP=1 -f /tmp/pagila-hw/pagila/pagila-schema.sql
-          docker-compose exec -T pg psql -U postgres -d pagila -v ON_ERROR_STOP=1 -f /tmp/pagila-hw/pagila/pagila-data.sql
+          # load schema
+          docker compose exec -T pg psql -U postgres -d pagila -v ON_ERROR_STOP=1 -f /tmp/pagila-hw/pagila/pagila-schema.sql
+
+          # load data
+          docker compose exec -T pg psql -U postgres -d pagila -v ON_ERROR_STOP=1 -f /tmp/pagila-hw/pagila/pagila-data.sql
 
           # run tests
-          docker-compose exec -T pg ./run_tests.sh
+          docker compose exec -T pg ./run_tests.sh
