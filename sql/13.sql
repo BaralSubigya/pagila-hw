@@ -14,4 +14,4 @@ JOIN language AS l
   ON f.language_id = l.language_id
 WHERE (f.title LIKE 'K%' OR f.title LIKE 'Q%')
   AND l.name = 'English'
-ORDER BY f.title, f.film_id;
+ORDER BY f.title;
