@@ -2,27 +2,37 @@ name: tests
 
 on:
   push:
-    branches: ['*']
+    branches: ["**"]
   pull_request:
-    branches: ['*']
+    branches: ["**"]
 
 jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repo (WITH submodules)
+        uses: actions/checkout@v4
         with:
           submodules: recursive
+          fetch-depth: 0
 
-      - name: Confirm submodule files exist
+      - name: Verify pagila submodule exists
         run: |
-          ls -la
-          ls -la pagila || true
+          echo "=== .gitmodules ==="
+          cat .gitmodules || true
+          echo "=== submodule status ==="
+          git submodule status || true
+          echo "=== ls pagila/ ==="
+          ls -la pagila | head -n 50
           test -f pagila/pagila-schema.sql
           test -f pagila/pagila-data.sql
 
-      - name: Run tests
+      - name: Build + start database
         run: |
           docker compose up -d --build
+          docker ps -a
           sleep 20
+
+      - name: Run tests
+        run: |
           docker compose exec -T pg ./run_tests.sh
