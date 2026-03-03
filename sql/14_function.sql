@@ -13,7 +13,7 @@ $$
   JOIN film AS f
     ON fc.film_id = f.film_id
   WHERE c.name = $1
-  ORDER BY f.title
+  ORDER BY f.title, f.film_id
 $$
 LANGUAGE SQL
 IMMUTABLE

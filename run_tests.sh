@@ -9,13 +9,13 @@ for problem in sql/*; do
     problem_id=$(basename "${problem%.sql}")
     result="results/$problem_id.out"
     expected="expected/$problem_id.out"
+
     # Run the SQL and capture output
     psql < "$problem" > "$result" 2> /dev/null
 
-    # Strip trailing blank lines (fixes CI diffs)
+    # Strip trailing blank lines at end of file (matches expected exactly)
     sed -i -e :a -e '/^[[:space:]]*$/{$d;N;ba' -e '}' "$result"
 
-    # Compare to expected output (ignore blank lines)
     DIFF=$(diff -B "$expected" "$result")
     if [ -z "$DIFF" ]; then
         echo pass
