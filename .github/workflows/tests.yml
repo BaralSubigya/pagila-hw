@@ -17,18 +17,17 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      - name: Build, init DB, and run tests
+      - name: Build and run docker container
         run: |
           set -e
 
           git submodule update --init --recursive
 
-          # IMPORTANT: start clean every run (fixes "mpaa_rating already exists")
+          # start fresh DB every CI run
           docker compose down -v || true
-
           docker compose up -d --build
 
-          # wait for postgres
+          # wait for postgres to accept connections
           for i in {1..60}; do
             if docker compose exec -T pg pg_isready -U postgres > /dev/null 2>&1; then
               echo "Postgres is ready"
@@ -38,12 +37,8 @@ jobs:
             sleep 1
           done
 
-          # create DB (ignore if it already exists)
-          docker compose exec -T pg psql -U postgres -d postgres -c "CREATE DATABASE pagila;" || true
+          # IMPORTANT:
+          # schema + data are already loaded automatically from:
+          # /docker-entrypoint-initdb.d/01.sql and 02.sql
 
-          # load schema + data
-          docker compose exec -T pg psql -U postgres -d pagila -v ON_ERROR_STOP=1 -f /tmp/pagila-hw/pagila/pagila-schema.sql
-          docker compose exec -T pg psql -U postgres -d pagila -v ON_ERROR_STOP=1 -f /tmp/pagila-hw/pagila/pagila-data.sql
-
-          # run tests
           docker compose exec -T pg ./run_tests.sh
