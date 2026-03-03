@@ -2,26 +2,18 @@ name: tests
 
 on:
   push:
-    branches: ["*"]
+    branches: ['*']
   pull_request:
-    branches: ["*"]
+    branches: ['*']
 
 jobs:
   docker:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout (with submodules)
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
+      - uses: actions/checkout@v4
 
-      - name: Run tests in Docker
+      - name: Run tests
         run: |
           docker compose up -d --build
-          docker ps -a
-
-          # wait for DB to finish initializing
           sleep 20
-
           docker compose exec -T pg ./run_tests.sh
