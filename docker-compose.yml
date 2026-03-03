@@ -1,11 +1,14 @@
-version: '3.3'
-
 services:
   pg:
     build: .
     volumes:
       - .:/tmp/pagila-hw
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=pass
-      - PGUSER=postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: pagila
+
+      # These make psql inside the container default to the right DB/user
+      PGUSER: postgres
+      PGDATABASE: pagila
+      PGPASSWORD: pass
