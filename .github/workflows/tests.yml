@@ -9,30 +9,27 @@ on:
 jobs:
   docker:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repo (WITH submodules)
+      - name: Checkout repo (with submodules)
         uses: actions/checkout@v4
         with:
           submodules: recursive
           fetch-depth: 0
 
-      - name: Verify pagila submodule exists
+      - name: Build and run docker container
         run: |
-          echo "=== .gitmodules ==="
-          cat .gitmodules || true
-          echo "=== submodule status ==="
-          git submodule status || true
-          echo "=== ls pagila/ ==="
-          ls -la pagila | head -n 50
-          test -f pagila/pagila-schema.sql
-          test -f pagila/pagila-data.sql
+          git submodule update --init --recursive
 
-      - name: Build + start database
-        run: |
-          docker compose up -d --build
-          docker ps -a
-          sleep 20
+          docker-compose up -d --build
+          sleep 10
 
-      - name: Run tests
-        run: |
-          docker compose exec -T pg ./run_tests.sh
+          # create pagila database (ignore if already exists)
+          docker-compose exec -T pg psql -U postgres -d postgres -c "CREATE DATABASE pagila;" || true
+
+          # load schema + data
+          docker-compose exec -T pg psql -U postgres -d pagila -v ON_ERROR_STOP=1 -f /tmp/pagila-hw/pagila/pagila-schema.sql
+          docker-compose exec -T pg psql -U postgres -d pagila -v ON_ERROR_STOP=1 -f /tmp/pagila-hw/pagila/pagila-data.sql
+
+          # run tests
+          docker-compose exec -T pg ./run_tests.sh
