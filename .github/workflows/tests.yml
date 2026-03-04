@@ -2,43 +2,25 @@ name: tests
 
 on:
   push:
-    branches: ["**"]
   pull_request:
-    branches: ["**"]
 
 jobs:
   docker:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo (with submodules)
+      - name: Checkout
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
-          fetch-depth: 0
 
-      - name: Build and run docker container
+      - name: Build docker image
+        run: docker compose build
+
+      - name: Start postgres
+        run: docker compose up -d
+
+      - name: Wait for postgres
         run: |
-          set -e
+          sleep 15
 
-          git submodule update --init --recursive
-
-          # start fresh DB every CI run
-          docker compose down -v || true
-          docker compose up -d --build
-
-          # wait for postgres to accept connections
-          for i in {1..60}; do
-            if docker compose exec -T pg pg_isready -U postgres > /dev/null 2>&1; then
-              echo "Postgres is ready"
-              break
-            fi
-            echo "Waiting for Postgres..."
-            sleep 1
-          done
-
-          # IMPORTANT:
-          # schema + data are already loaded automatically from:
-          # /docker-entrypoint-initdb.d/01.sql and 02.sql
-
-          docker compose exec -T pg ./run_tests.sh
+      - name: Run tests
+        run: docker compose exec -T pg ./run_tests.sh
