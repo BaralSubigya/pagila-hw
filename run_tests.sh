@@ -4,7 +4,7 @@ failed=false
 
 mkdir -p results
 
-for problem in sql/*; do
+for problem in sql/*.sql; do
     printf "$problem "
     problem_id=$(basename "${problem%.sql}")
     result="results/$problem_id.out"

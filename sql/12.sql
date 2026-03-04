@@ -3,7 +3,13 @@
  * List the customers alphabetically by last name.
  * Use tables payment and customer.
  */
-SELECT customer.customer_id, first_name, last_name, SUM(amount)
-FROM customer JOIN payment ON customer.customer_id = payment.customer_id
-GROUP BY customer.customer_id
-ORDER BY last_name ASC;
+SELECT
+  c.customer_id,
+  c.first_name,
+  c.last_name,
+  SUM(p.amount) AS sum
+FROM customer AS c
+JOIN payment AS p
+  ON c.customer_id = p.customer_id
+GROUP BY c.customer_id, c.first_name, c.last_name
+ORDER BY c.last_name, c.first_name, c.customer_id;

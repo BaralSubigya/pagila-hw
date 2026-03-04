@@ -10,6 +10,4 @@ JOIN film_category AS fc
 JOIN film AS f
   ON fc.film_id = f.film_id
 WHERE c.name = 'Family'
-ORDER BY
-  f.title,
-  f.film_id;
+ORDER BY f.title, f.film_id;
