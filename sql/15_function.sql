@@ -5,19 +5,14 @@
 CREATE OR REPLACE FUNCTION category_counts_by_language(TEXT)
 RETURNS TABLE(name TEXT, count BIGINT) AS
 $$
-  SELECT
-    c.name,
-    COUNT(*) AS count
-  FROM category AS c
-  JOIN film_category AS fc
-    ON c.category_id = fc.category_id
-  JOIN film AS f
-    ON fc.film_id = f.film_id
-  JOIN language AS l
-    ON f.language_id = l.language_id
-  WHERE l.name = $1
-  GROUP BY c.name
-  ORDER BY c.name
+	SELECT category.name, count(*)
+	FROM language 
+		JOIN film ON film.language_id = language.language_id
+		JOIN film_category ON film.film_id = film_category.film_id
+		JOIN category ON film_category.category_id = category.category_id
+	WHERE language.name = $1
+	GROUP BY category.name
+	ORDER BY category.name
 $$
 LANGUAGE SQL
 IMMUTABLE
