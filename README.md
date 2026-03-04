@@ -1,5 +1,4 @@
-# pagila-hw
-[![](https://github.com/BaralSubigya/pagila-hw/actions/workflows/tests.yml/badge.svg)](https://github.com/BaralSubigya/pagila-hw/actions?query=workflow%3Atests)
+# pagila-hw [![](https://github.com/BaralSubigya/pagila-hw/actions/workflows/tests.yml/badge.svg)](https://github.com/BaralSubigya/pagila-hw/actions?query=workflow%3Atests)
 
 ## Background
 
@@ -75,4 +74,4 @@ The following picture illustrates the database's structure:
     For the first failing test case, you will receive -4 points.
     For each additional failing test case, you will receive -1 point. 
     If the github actions do not run correctly, you will receive a 0.
-# trigger
+
